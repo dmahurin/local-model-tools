@@ -1,0 +1,55 @@
+#!/bin/sh -e
+
+HOST="localhost"
+PORT=8080
+SERVER="$(dirname "$0")"/start-llm-server
+SERVER_PID=""
+
+is_listening() {
+  lsof >/dev/null 2>&1 || return 1
+  lsof -iTCP@"$HOST":"$PORT" -sTCP:LISTEN >/dev/null 2>&1
+}
+
+cleanup() {
+  if [ -n "$SERVER_PID" ]; then
+    echo "Stopping server (pid $SERVER_PID)..." >&2
+    kill -INT "$SERVER_PID" 2>/dev/null || true
+    sleep 5
+    for _ in 1 2 3 4 5; do
+      kill -0 "$SERVER_PID" 2>/dev/null || break
+      sleep 1
+    done
+    kill -9 "$SERVER_PID" 2>/dev/null || true
+  fi
+}
+trap 'cleanup; exit' INT TERM EXIT
+
+if is_listening; then
+  echo "Server already listening on $HOST:$PORT" >&2
+else
+  echo "Starting server..." 1>&2
+  nohup "$SERVER" >/dev/null 2>&1 &
+  SERVER_PID=$!
+
+  for _ in {1..20}; do
+    is_listening && break
+    sleep 0.5
+  done
+
+  is_listening || { echo "Server did not start in time" >&2; cleanup; exit 1; }
+  echo "Server started (pid $SERVER_PID)"
+  sleep 5
+fi
+
+args="--oss -c model=gpt-oss:20b -s workspace-write"
+if [ $# -ne 0 ]; then
+  args="exec $args --skip-git-repo-check"
+fi
+
+if [ "$1" = "resume" ]; then
+  args="$args $1 $2"
+  shift
+  shift
+fi
+
+CODEX_OSS_BASE_URL="http://localhost:8080/v1" npx @openai/codex $args "$*"
