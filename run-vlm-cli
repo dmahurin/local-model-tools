@@ -1,0 +1,34 @@
+#!/bin/sh -e
+
+script_dir="$(dirname "$0")"
+
+if [ -e "$script_dir/.env" ]; then
+ set -o allexport
+ . "$script_dir/.env"
+ set +o allexport
+else
+VLM_MODEL="$(hf download unsloth/gemma-3-4b-it-GGUF gemma-3-4b-it-Q4_K_M.gguf)"
+VLM_MMPROJ="$(hf download unsloth/gemma-3-4b-it-GGUF mmproj-BF16.gguf)"
+fi
+
+first_ext="${1##*.}"
+
+arg1=
+arg2=
+if [ "$first_ext" = 'png' -o "$first_ext" = 'jpg' ]; then
+ arg1='--image'
+ arg2="$1"
+ shift
+elif [ "$first_ext" = 'webp' ]; then
+ arg1='--image'
+ tmp_image="$(mktemp --suffix .jpg)"
+ arg2="$tmp_image"
+ convert "$1" -strip "$tmp_image"
+ shift
+fi
+
+prompt="$*"
+
+llama-mtmd-cli -m "$VLM_MODEL" --mmproj "$VLM_MMPROJ" -c 0 $arg1 $arg2 -p "$prompt" 2>/dev/null
+
+[ -z "$tmp_image" ] || rm -f "$tmp_image"
