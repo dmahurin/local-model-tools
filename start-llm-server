@@ -1,0 +1,14 @@
+#!/bin/sh
+
+script_dir="$(dirname "$0")"
+
+if [ -e "$script_dir/.env" ]; then
+ set -o allexport
+ . "$script_dir/.env"
+ set +o allexport
+else
+ MODEL="$(hf download bartowski/openai_gpt-oss-20b-GGUF openai_gpt-oss-20b-MXFP4.gguf)"
+fi
+
+exec llama-server -m "$MODEL" -c 0 --jinja -a gpt-oss:20b
+
