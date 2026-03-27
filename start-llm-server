@@ -1,14 +1,20 @@
 #!/bin/sh
 
-script_dir="$(dirname "$0")"
+cat <<EOF>/tmp/models-preset.ini
+version = 1
 
-if [ -e "$script_dir/.env" ]; then
- set -o allexport
- . "$script_dir/.env"
- set +o allexport
-else
- MODEL="$(hf download bartowski/openai_gpt-oss-20b-GGUF openai_gpt-oss-20b-MXFP4.gguf)"
-fi
+[gpt-oss:20b]
+m=$(hf download bartowski/openai_gpt-oss-20b-GGUF openai_gpt-oss-20b-MXFP4.gguf)
+jinja = on
 
-exec llama-server -m "$MODEL" -c 0 --jinja -a gpt-oss:20b
+[gemma-3-4b-it]
+m=$(hf download unsloth/gemma-3-4b-it-GGUF gemma-3-4b-it-Q4_K_M.gguf)
+mmproj=$(hf download unsloth/gemma-3-4b-it-GGUF mmproj-BF16.gguf)
+
+[qwen3.5:9b]
+m=$(hf download unsloth/Qwen3.5-9B-GGUF Qwen3.5-9B-Q4_K_M.gguf)
+mmproj=$(hf download unsloth/Qwen3.5-9B-GGUF mmproj-BF16.gguf)
+EOF
+
+exec llama-server --host 0.0.0.0 --models-preset /tmp/models-preset.ini
 
