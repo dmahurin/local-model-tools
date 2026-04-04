@@ -46,7 +46,7 @@ def get_models_presets(selection):
 if __name__ == "__main__":
   previous_selection = load_selection()
   
-  if not previous_selection or len(sys.argv) > 1 and sys.argv[1] == '-select':
+  if not previous_selection or len(sys.argv) > 1 and sys.argv[1] == '-config':
     selected = get_selection("Select models to use, then press Enter", models, previous_selection)
     save_selection(selected.keys())
   else:
