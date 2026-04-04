@@ -7,13 +7,13 @@ m=openai_gpt-oss-20b-MXFP4.gguf
 jinja = on
 load-on-startup=on
 
-[unsloth/gemma-3-4b-it-GGUF:Q4_K_M]
-hf-repo=unsloth/gemma-3-4b-it-GGUF
-m=gemma-3-4b-it-Q4_K_M.gguf
+[unsloth/gemma-4-26B-A4B-it-GGUF:MXFP4_MOE]
+hf-repo=unsloth/gemma-4-26B-A4B-it-GGUF
+m=gemma-4-26B-A4B-it-MXFP4_MOE.gguf
 
-[unsloth/Qwen3.5-9B-GGUF:Q4_K_M]
-hf-repo=unsloth/Qwen3.5-9B-GGUF
-m=Qwen3.5-9B-Q4_K_M.gguf
+[unsloth/Qwen3.5-35B-A3B-GGUF:MXFP4_MOE]
+hf-repo=unsloth/Qwen3.5-35B-A3B-GGUF
+m=Qwen3.5-35B-A3B-MXFP4_MOE.gguf
 EOF
 
 exec llama-server --host 0.0.0.0 --models-max 1 --models-preset /tmp/models-preset.ini
