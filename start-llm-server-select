@@ -2,17 +2,16 @@
 import sys
 from pathlib import Path
 from prompt_toolkit.shortcuts import checkboxlist_dialog
-from huggingface_hub import hf_hub_download
 import subprocess
 
 SELECTION_FILE = Path(__file__).resolve().parent / "selection.txt"
 
 models = {
-  "gpt-oss:20b": {"modelpath": "bartowski/openai_gpt-oss-20b-GGUF", "m": "openai_gpt-oss-20b-MXFP4.gguf", "jinja": "on"},
-  "qwen3.5:9b": {"modelpath": "unsloth/Qwen3.5-9B-GGUF", "m": "Qwen3.5-9B-Q4_K_M.gguf", "mmproj": "mmproj-BF16.gguf"},
-  "qwen3.5:27b": {"modelpath": "unsloth/Qwen3.5-9B-GGUF", "m": "Qwen3.5-27B-Q4_K_M.gguf", "mmproj": "mmproj-BF16.gguf"},
-  "gemma-3-4b-it": {"modelpath": "unsloth/gemma-3-4b-it-GGUF", "m": "gemma-3-4b-it-Q4_K_M.gguf", "mmproj": "mmproj-BF16.gguf"},
-  "gpt-oss:120b": {"modelpath": "bartowski/openai_gpt-oss-120b-GGUF", "m": "openai_gpt-oss-120b-MXFP4.gguf", "jinja": "on"}
+  "bartowski/openai_gpt-oss-20b-GGUF:MXFP4": {"hf-repo": "bartowski/openai_gpt-oss-20b-GGUF", "m": "openai_gpt-oss-20b-MXFP4.gguf", "jinja": "on"},
+  "unsloth/Qwen3.5-9B-GGUF:Q4_K_M": {"hf-repo": "unsloth/Qwen3.5-9B-GGUF", "m": "Qwen3.5-9B-Q4_K_M.gguf", "mmproj": "mmproj-BF16.gguf"},
+  "unsloth/Qwen3.5-27B-GGUF:Q4_K_M": {"hf-repo": "unsloth/Qwen3.5-9B-GGUF", "m": "Qwen3.5-27B-Q4_K_M.gguf", "mmproj": "mmproj-BF16.gguf"},
+  "unsloth/gemma-3-4b-it-GGUF:Q4_K_M": {"hf-repo": "unsloth/gemma-3-4b-it-GGUF", "m": "gemma-3-4b-it-Q4_K_M.gguf", "mmproj": "mmproj-BF16.gguf"},
+  "bartowski/openai_gpt-oss-120b-GGUF:MXFP4": {"hf-repo": "bartowski/openai_gpt-oss-120b-GGUF", "m": "openai_gpt-oss-120b-MXFP4.gguf", "jinja": "on"}
 }
 
 def load_selection():
@@ -30,16 +29,14 @@ def get_selection(prompt, items, previous_selection):
   return {item["name"]: {k: v for k, v in item.items() if k != "name"} for item in results}
 
 def get_models_presets(selection):
-  result = "version = 1"
+  result = ''
 
   for name, model in selection.items():
     model = model.copy()
-    if 'modelpath' in model: 
-      if 'm' in model: 
-        model['m'] = hf_hub_download(repo_id=model['modelpath'], filename=model['m'])
-      if 'mmproj' in model: 
-        model['mmproj'] = hf_hub_download(repo_id=model['modelpath'], filename=model['mmproj'])
-      del model['modelpath']
+    if not result:
+      #result = "version = 1"
+      model['load-on-startup'] = 'on'
+    if 'mmproj' in model: del model['mmproj']
     result += f"\n\n[{name}]\n"+'\n'.join([n + '=' + v for n, v in model.items()])
   return result
 
@@ -54,4 +51,4 @@ if __name__ == "__main__":
 
   with open("/tmp/models-preset.ini", "w") as f:
     f.write(get_models_presets(selected))
-  subprocess.run(['llama-server', '--host', '0.0.0.0', '--models-preset', '/tmp/models-preset.ini'])
+  subprocess.run(['llama-server', '--host', '0.0.0.0', '--models-max', '1', '--models-preset', '/tmp/models-preset.ini'])

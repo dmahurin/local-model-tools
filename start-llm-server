@@ -1,20 +1,20 @@
 #!/bin/sh
 
 cat <<EOF>/tmp/models-preset.ini
-version = 1
-
-[gpt-oss:20b]
-m=$(hf download bartowski/openai_gpt-oss-20b-GGUF openai_gpt-oss-20b-MXFP4.gguf)
+[bartowski/openai_gpt-oss-20b-GGUF:MXFP4]
+hf-repo=bartowski/openai_gpt-oss-20b-GGUF
+m=openai_gpt-oss-20b-MXFP4.gguf
 jinja = on
+load-on-startup=on
 
-[gemma-3-4b-it]
-m=$(hf download unsloth/gemma-3-4b-it-GGUF gemma-3-4b-it-Q4_K_M.gguf)
-mmproj=$(hf download unsloth/gemma-3-4b-it-GGUF mmproj-BF16.gguf)
+[unsloth/gemma-3-4b-it-GGUF:Q4_K_M]
+hf-repo=unsloth/gemma-3-4b-it-GGUF
+m=gemma-3-4b-it-Q4_K_M.gguf
 
-[qwen3.5:9b]
-m=$(hf download unsloth/Qwen3.5-9B-GGUF Qwen3.5-9B-Q4_K_M.gguf)
-mmproj=$(hf download unsloth/Qwen3.5-9B-GGUF mmproj-BF16.gguf)
+[unsloth/Qwen3.5-9B-GGUF:Q4_K_M]
+hf-repo=unsloth/Qwen3.5-9B-GGUF
+m=Qwen3.5-9B-Q4_K_M.gguf
 EOF
 
-exec llama-server --host 0.0.0.0 --models-preset /tmp/models-preset.ini
+exec llama-server --host 0.0.0.0 --models-max 1 --models-preset /tmp/models-preset.ini
 
