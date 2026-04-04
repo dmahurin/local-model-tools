@@ -1,0 +1,18 @@
+image="$1"
+prompt="$2"
+
+width="$(identify -format "%w" "$image")"
+height="$(identify -format "%h" "$image")"
+
+width="$(( $width / 16 * 16 ))"
+height="$(( $height / 16 * 16 ))"
+
+convert "$image" -strip -crop "${width}x${height}+0+0" /tmp/a.png
+
+if [ "$width" -lt 200 ]; then
+width="$(( $width * 2 ))"
+height="$(( $height * 2 ))"
+fi
+
+image=/tmp/a.png
+mflux-generate-kontext --low-ram --auto-seeds 2 --model krea-dev --model `hf download --quiet akx/FLUX.1-Kontext-dev-mflux-4bit` --image-path "$image" --guidance 2.5 --prompt "$prompt"  -q 8  --steps 20 --width "$width" --height "$height"
