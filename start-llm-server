@@ -14,7 +14,9 @@ models = {
   "unsloth/Qwen3.5-9B-GGUF:Q4_K_M": {"hf-repo": "unsloth/Qwen3.5-9B-GGUF", "m": "Qwen3.5-9B-Q4_K_M.gguf"},
   "unsloth/Qwen3.5-27B-GGUF:Q4_K_M": {"hf-repo": "unsloth/Qwen3.5-27B-GGUF", "m": "Qwen3.5-27B-Q4_K_M.gguf"},
   "unsloth/gemma-3-4b-it-GGUF:Q4_K_M": {"hf-repo": "unsloth/gemma-3-4b-it-GGUF", "m": "gemma-3-4b-it-Q4_K_M.gguf"},
-  "bartowski/openai_gpt-oss-120b-GGUF:MXFP4": {"hf-repo": "bartowski/openai_gpt-oss-120b-GGUF", "m": "openai_gpt-oss-120b-MXFP4.gguf", "jinja": "on"}
+  "bartowski/openai_gpt-oss-120b-GGUF:MXFP4": {"hf-repo": "bartowski/openai_gpt-oss-120b-GGUF", "m": "openai_gpt-oss-120b-MXFP4.gguf", "jinja": "on"},
+  "prism-ml/Bonsai-1.7B-gguf:Q1_0": {"hf-repo": "prism-ml/Bonsai-1.7B-gguf", "m": "Bonsai-1.7B.gguf"},
+  "prism-ml/Bonsai-8B-gguf:Q1_0": {"hf-repo": "prism-ml/Bonsai-8B-gguf", "m": "Bonsai-8B.gguf"}
 }
 
 def load_selection():
