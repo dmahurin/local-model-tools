@@ -6,15 +6,20 @@ import subprocess
 
 SELECTION_FILE = Path(__file__).resolve().parent / "selection.txt"
 
-models = {
-  "bartowski/openai_gpt-oss-20b-GGUF:MXFP4": {"hf-repo": "bartowski/openai_gpt-oss-20b-GGUF", "m": "openai_gpt-oss-20b-MXFP4.gguf", "jinja": "on"},
-  "unsloth/gemma-4-26B-A4B-it-GGUF:MXFP4_MOE": {"hf-repo": "unsloth/gemma-4-26B-A4B-it-GGUF", "m": "gemma-4-26B-A4B-it-MXFP4_MOE.gguf"},
-  "unsloth/Qwen3.5-35B-A3B-GGUF:MXFP4_MOE": {"hf-repo": "unsloth/Qwen3.5-35B-A3B-GGUF", "m": "Qwen3.5-35B-A3B-MXFP4_MOE.gguf"},
-  "unsloth/GLM-4.7-Flash-GGUF:MXFP4_MOE": {"hf-repo": "unsloth/GLM-4.7-Flash-GGUF", "m": "GLM-4.7-Flash-MXFP4_MOE.gguf"},
-  "unsloth/Qwen3.5-9B-GGUF:Q4_K_M": {"hf-repo": "unsloth/Qwen3.5-9B-GGUF", "m": "Qwen3.5-9B-Q4_K_M.gguf"},
-  "unsloth/Qwen3.5-27B-GGUF:Q4_K_M": {"hf-repo": "unsloth/Qwen3.5-27B-GGUF", "m": "Qwen3.5-27B-Q4_K_M.gguf"},
-  "unsloth/gemma-3-4b-it-GGUF:Q4_K_M": {"hf-repo": "unsloth/gemma-3-4b-it-GGUF", "m": "gemma-3-4b-it-Q4_K_M.gguf"},
-  "bartowski/openai_gpt-oss-120b-GGUF:MXFP4": {"hf-repo": "bartowski/openai_gpt-oss-120b-GGUF", "m": "openai_gpt-oss-120b-MXFP4.gguf", "jinja": "on"}
+models = [
+  {"name": "bartowski/openai_gpt-oss-20b-GGUF:MXFP4", "hf-repo": "bartowski/openai_gpt-oss-20b-GGUF", "m": "openai_gpt-oss-20b-MXFP4.gguf", "jinja": "on"},
+  {"name": "unsloth/gemma-4-26B-A4B-it-GGUF:MXFP4_MOE", "hf-repo": "unsloth/gemma-4-26B-A4B-it-GGUF", "m": "gemma-4-26B-A4B-it-MXFP4_MOE.gguf"},
+  {"name": "unsloth/Qwen3.5-35B-A3B-GGUF:MXFP4_MOE", "hf-repo": "unsloth/Qwen3.5-35B-A3B-GGUF", "m": "Qwen3.5-35B-A3B-MXFP4_MOE.gguf"},
+  {"name": "unsloth/GLM-4.7-Flash-GGUF:MXFP4_MOE", "hf-repo": "unsloth/GLM-4.7-Flash-GGUF", "m": "GLM-4.7-Flash-MXFP4_MOE.gguf"},
+  {"name": "unsloth/Qwen3.5-9B-GGUF:Q4_K_M", "hf-repo": "unsloth/Qwen3.5-9B-GGUF", "m": "Qwen3.5-9B-Q4_K_M.gguf"},
+  {"name": "unsloth/Qwen3.5-27B-GGUF:Q4_K_M", "hf-repo": "unsloth/Qwen3.5-27B-GGUF", "m": "Qwen3.5-27B-Q4_K_M.gguf"},
+  {"name": "unsloth/gemma-3-4b-it-GGUF:Q4_K_M", "hf-repo": "unsloth/gemma-3-4b-it-GGUF", "m": "gemma-3-4b-it-Q4_K_M.gguf"},
+  {"name": "bartowski/openai_gpt-oss-120b-GGUF:MXFP4", "hf-repo": "bartowski/openai_gpt-oss-120b-GGUF", "m": "openai_gpt-oss-120b-MXFP4.gguf", "jinja": "on"}
+]
+
+models_dict = {
+  item.get("name") or item.get("hf-repo"): {k: v for k, v in item.items() if k != "name"}
+  for item in models
 }
 
 def load_selection():
@@ -26,10 +31,9 @@ def save_selection(selection):
   SELECTION_FILE.write_text("\n".join(selection) + ("\n" if selection else ""), encoding="utf-8")
 
 def get_selection(prompt, items, previous_selection):
-  default_values = [v | {"name": k} for k, v in items.items() if k in previous_selection]
- 
-  results = checkboxlist_dialog(text=prompt, values=[(v | {"name": n}, n) for n, v in items.items()], default_values=default_values).run()
-  return {item["name"]: {k: v for k, v in item.items() if k != "name"} for item in results}
+  default_values = [name for name in items if name in previous_selection]
+  results = checkboxlist_dialog(text=prompt, values=[(name, name) for name in items], default_values=default_values).run() or []
+  return {name: items[name] for name in results}
 
 def get_models_presets(selection):
   result = ''
@@ -47,10 +51,10 @@ if __name__ == "__main__":
   previous_selection = load_selection()
   
   if not previous_selection or len(sys.argv) > 1 and sys.argv[1] == '-config':
-    selected = get_selection("Select models to use, then press Enter", models, previous_selection)
+    selected = get_selection("Select models to use, then press Enter", models_dict, previous_selection)
     save_selection(selected.keys())
   else:
-    selected = {k: v for k, v in models.items() if k in previous_selection}
+    selected = {k: v for k, v in models_dict.items() if k in previous_selection}
 
   with open("/tmp/models-preset.ini", "w") as f:
     f.write(get_models_presets(selected))
