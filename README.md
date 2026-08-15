@@ -6,8 +6,7 @@ local language model servers and clients from the command line.
 ## Tools
 
 ### `run-codex-cli`
-Launches the local LLM server (if it isn't already running) and then
-executes the `@openai/codex` CLI against it.
+Executes the `@openai/codex` CLI against the local LLM server.
 
 Run interactively:
 ```bash
@@ -46,4 +45,13 @@ Run VLM model using `llama-mtmd`. Uses gemma-3-4b-it by default.
 Run non-interactively:
 ```bash
 run-vlm-cli image.jpg "Describe this image."
+```
+
+### `image2image`
+Edits an existing image based on a text prompt. Uses `mflux` with the `flux2-klein-4b-mlx-4bit` model to perform image-to-image generation.
+Requires `imagemagick` (`identify` and `convert`) and `mflux-generate-flux2-edit`.
+
+Usage:
+```bash
+image2image "A futuristic cyberpunk version of this cat" cat.png
 ```
