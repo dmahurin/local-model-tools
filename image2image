@@ -1,5 +1,6 @@
+prompt="$1"
+shift
 image="$1"
-prompt="$2"
 
 width="$(identify -format "%w" "$image")"
 height="$(identify -format "%h" "$image")"
@@ -15,4 +16,4 @@ height="$(( $height * 2 ))"
 fi
 
 image=/tmp/a.png
-mflux-generate-kontext --low-ram --auto-seeds 2 --model krea-dev --model `hf download --quiet akx/FLUX.1-Kontext-dev-mflux-4bit` --image-path "$image" --guidance 2.5 --prompt "$prompt"  -q 8  --steps 20 --width "$width" --height "$height"
+mflux-generate-flux2-edit --low-ram --auto-seeds 2  --model `hf download --quiet themindstudio/flux2-klein-4b-mlx-4bit` --image-paths "$@" --prompt "$prompt" --steps 20 --width "$width" --height "$height"
