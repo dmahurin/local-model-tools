@@ -5,7 +5,6 @@ if [ -f "$SCRIPT_DIR/.env" ]; then
     . "$SCRIPT_DIR/.env"
 fi
 
-MODEL=unsloth/gemma-4-26B-A4B-it-GGUF
-SERVER=${SERVER:-"http://localhost:8080"}
-export CODEX_HOME="${CODEX_HOME:-.codex}"
-CODEX_OSS_BASE_URL="$SERVER" codex --oss --disable remote_models -c web_search=disabled --local-provider=lmstudio -s workspace-write -m "$MODEL" "$@"
+SERVER=${MODEL_SERVER:-"http://localhost:8080"}
+MODEL=${LLM_MODEL:-"$(curl -s $SERVER/models | jq -r '.data[0].id')"}
+codex -c model_provider="llamacpp" -c model="$MODEL" -c model_providers.llamacpp.name="llama.cpp" -c model_providers.llamacpp.base_url="$SERVER/v1" -c model_providers.llamacpp.wire_api="responses" -c model_providers.llamacpp.api_key="x" "$@"
