@@ -7,14 +7,13 @@ import subprocess
 SELECTION_FILE = Path(__file__).resolve().parent / "selection.txt"
 
 models = [
-  {"name": "bartowski/openai_gpt-oss-20b-GGUF:MXFP4", "hf-repo": "bartowski/openai_gpt-oss-20b-GGUF", "m": "openai_gpt-oss-20b-MXFP4.gguf", "jinja": "on"},
-  {"name": "unsloth/gemma-4-26B-A4B-it-GGUF:MXFP4_MOE", "hf-repo": "unsloth/gemma-4-26B-A4B-it-GGUF", "m": "gemma-4-26B-A4B-it-MXFP4_MOE.gguf"},
-  {"name": "unsloth/Qwen3.5-35B-A3B-GGUF:MXFP4_MOE", "hf-repo": "unsloth/Qwen3.5-35B-A3B-GGUF", "m": "Qwen3.5-35B-A3B-MXFP4_MOE.gguf"},
-  {"name": "unsloth/GLM-4.7-Flash-GGUF:MXFP4_MOE", "hf-repo": "unsloth/GLM-4.7-Flash-GGUF", "m": "GLM-4.7-Flash-MXFP4_MOE.gguf"},
-  {"name": "unsloth/Qwen3.5-9B-GGUF:Q4_K_M", "hf-repo": "unsloth/Qwen3.5-9B-GGUF", "m": "Qwen3.5-9B-Q4_K_M.gguf"},
-  {"name": "unsloth/Qwen3.5-27B-GGUF:Q4_K_M", "hf-repo": "unsloth/Qwen3.5-27B-GGUF", "m": "Qwen3.5-27B-Q4_K_M.gguf"},
-  {"name": "unsloth/gemma-3-4b-it-GGUF:Q4_K_M", "hf-repo": "unsloth/gemma-3-4b-it-GGUF", "m": "gemma-3-4b-it-Q4_K_M.gguf"},
-  {"name": "bartowski/openai_gpt-oss-120b-GGUF:MXFP4", "hf-repo": "bartowski/openai_gpt-oss-120b-GGUF", "m": "openai_gpt-oss-120b-MXFP4.gguf", "jinja": "on"}
+  {"hf-repo": "unsloth/gemma-4-26B-A4B-it-GGUF", "m": "gemma-4-26B-A4B-it-MXFP4_MOE.gguf"},
+  {"hf-repo": "unsloth/Qwen3.5-35B-A3B-GGUF", "m": "Qwen3.5-35B-A3B-MXFP4_MOE.gguf"},
+  {"hf-repo": "bartowski/openai_gpt-oss-20b-GGUF", "m": "openai_gpt-oss-20b-MXFP4.gguf", "jinja": "on"},
+  {"hf-repo": "unsloth/GLM-4.7-Flash-GGUF", "m": "GLM-4.7-Flash-MXFP4_MOE.gguf"},
+  {"hf-repo": "unsloth/Qwen3.5-9B-GGUF", "m": "Qwen3.5-9B-Q4_K_M.gguf"},
+  {"hf-repo": "unsloth/Qwen3.5-27B-GGUF", "m": "Qwen3.5-27B-Q4_K_M.gguf"},
+  {"hf-repo": "unsloth/gemma-3-4b-it-GGUF", "m": "gemma-3-4b-it-Q4_K_M.gguf"},
 ]
 
 models_dict = {
