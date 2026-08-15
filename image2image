@@ -1,3 +1,5 @@
+#!/bin/sh
+
 prompt="$1"
 shift
 image="$1"
