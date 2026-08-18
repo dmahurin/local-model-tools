@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "local-model-tools"
+version = "0.1.0"
+description = "Command-line helpers for running local language and vision models"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "prompt-toolkit>=3.0",
+]
+
+[tool.setuptools]
+script-files = [
+    "image2image",
+    "run-codex-cli",
+    "run-llm-cli",
+    "run-vlm-cli",
+    "start-llm-server",
+]
