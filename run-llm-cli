@@ -6,13 +6,12 @@ if [ -e "$script_dir/.env" ]; then
  set -o allexport
  . "$script_dir/.env"
  set +o allexport
-else
- MODEL="$(hf download bartowski/openai_gpt-oss-20b-GGUF openai_gpt-oss-20b-MXFP4.gguf)"
 fi
+MODEL="${LLM_MODEL:-"unsloth/gemma-4-26B-A4B-it-GGUF:MXFP4_MOE"}"
 
 if [ $# -eq 0 ]; then
  args=-i
 else
  args="-st -p"
 fi
-exec llama-cli -m "$MODEL" -c 0 $args "$@" 2>/dev/null
+exec llama-cli -hf "$MODEL" -c 0 $args "$@" 2>/dev/null
