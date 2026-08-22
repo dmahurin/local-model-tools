@@ -2,7 +2,13 @@
 
 from pathlib import Path
 
+from prompt_toolkit import Application
+from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.layout import HSplit, Layout, Window
+from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.shortcuts import checkboxlist_dialog, radiolist_dialog
+from prompt_toolkit.styles import Style
+from prompt_toolkit.widgets import Dialog, Label
 
 
 CONFIG_FILE = Path.home() / ".local-model-config.env"
@@ -53,6 +59,70 @@ def summarize(models):
     return f"{models[0]} (+{len(models) - 1} more)"
 
 
+def main_menu(llm_model, vlm_model, server_models):
+    items = [
+        ("server", f"LLM Server Models: {summarize(server_models)}"),
+        ("llm", f"LLM Model: {llm_model}"),
+        ("vlm", f"VLM Model: {vlm_model}"),
+        ("save", "Done"),
+        ("cancel", "Cancel"),
+    ]
+    selected = 0
+
+    def menu_text():
+        return [
+            ("class:selected" if index == selected else "", f"  {label}\n")
+            for index, (_, label) in enumerate(items)
+        ]
+
+    bindings = KeyBindings()
+
+    @bindings.add("up")
+    @bindings.add("k")
+    def move_up(event):
+        nonlocal selected
+        selected = (selected - 1) % len(items)
+        event.app.invalidate()
+
+    @bindings.add("down")
+    @bindings.add("j")
+    def move_down(event):
+        nonlocal selected
+        selected = (selected + 1) % len(items)
+        event.app.invalidate()
+
+    @bindings.add("enter")
+    def accept(event):
+        event.app.exit(result=items[selected][0])
+
+    @bindings.add("escape")
+    @bindings.add("c-c")
+    def cancel(event):
+        event.app.exit(result="cancel")
+
+    menu = Window(
+        content=FormattedTextControl(menu_text, focusable=True),
+        always_hide_cursor=True,
+        height=len(items),
+    )
+    root = Dialog(
+        title="Local Model Configuration",
+        body=HSplit([
+            Label("Use arrows and press Enter", dont_extend_height=True),
+            menu,
+        ], padding=1),
+        buttons=[],
+        with_background=True,
+    )
+    return Application(
+        layout=Layout(root, focused_element=menu),
+        key_bindings=bindings,
+        style=Style.from_dict({"selected": "reverse"}),
+        full_screen=True,
+        erase_when_done=True,
+    ).run()
+
+
 def main():
     config = load_config()
     llm_model = config.get("LLM_MODEL", DEFAULT_MODEL)
@@ -64,17 +134,7 @@ def main():
     ]
 
     while True:
-        action = radiolist_dialog(
-            title="Local Model Configuration",
-            text="Select a category to configure",
-            values=[
-                ("server", f"LLM Server Models: {summarize(server_models)}"),
-                ("llm", f"LLM Model: {llm_model}"),
-                ("vlm", f"VLM Model: {vlm_model}"),
-                ("save", "Save and exit"),
-                ("cancel", "Exit without saving"),
-            ],
-        ).run()
+        action = main_menu(llm_model, vlm_model, server_models)
 
         if action in (None, "cancel"):
             return
