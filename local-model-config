@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+
+from pathlib import Path
+
+from prompt_toolkit.shortcuts import checkboxlist_dialog, radiolist_dialog
+
+
+CONFIG_FILE = Path.home() / ".local-model-config.env"
+DEFAULT_MODEL = "unsloth/gemma-3-4b-it-GGUF:Q4_K_M"
+
+# Keep this list in sync with the model list in start-llm-server. Server-only
+# options such as jinja are intentionally not duplicated here.
+MODELS = [
+    "unsloth/gemma-4-26B-A4B-it-GGUF:MXFP4_MOE",
+    "unsloth/Qwen3.5-35B-A3B-GGUF:MXFP4_MOE",
+    "bartowski/openai_gpt-oss-20b-GGUF:MXFP4",
+    "unsloth/GLM-4.7-Flash-GGUF:MXFP4_MOE",
+    "unsloth/Qwen3.5-9B-GGUF:Q4_K_M",
+    "unsloth/Qwen3.5-27B-GGUF:Q4_K_M",
+    "unsloth/gemma-3-4b-it-GGUF:Q4_K_M",
+]
+
+
+def load_config():
+    config = {}
+    if CONFIG_FILE.exists():
+        for line in CONFIG_FILE.read_text(encoding="utf-8").splitlines():
+            if line and not line.lstrip().startswith("#") and "=" in line:
+                name, value = line.split("=", 1)
+                config[name] = value
+    return config
+
+
+def save_config(config):
+    content = "".join(f"{name}={value}\n" for name, value in config.items())
+    CONFIG_FILE.write_text(content, encoding="utf-8")
+
+
+def choose_one(title, current):
+    return radiolist_dialog(
+        title=title,
+        text="Select a model, then press Enter",
+        values=[(model, model) for model in MODELS],
+        default=current if current in MODELS else None,
+    ).run()
+
+
+def summarize(models):
+    if not models:
+        return "none"
+    if len(models) == 1:
+        return models[0]
+    return f"{models[0]} (+{len(models) - 1} more)"
+
+
+def main():
+    config = load_config()
+    llm_model = config.get("LLM_MODEL", DEFAULT_MODEL)
+    vlm_model = config.get("VLM_MODEL", DEFAULT_MODEL)
+    server_models = [
+        model
+        for model in config.get("LLM_SERVER_MODELS", DEFAULT_MODEL).split(",")
+        if model
+    ]
+
+    while True:
+        action = radiolist_dialog(
+            title="Local Model Configuration",
+            text="Select a category to configure",
+            values=[
+                ("server", f"LLM Server Models: {summarize(server_models)}"),
+                ("llm", f"LLM Model: {llm_model}"),
+                ("vlm", f"VLM Model: {vlm_model}"),
+                ("save", "Save and exit"),
+                ("cancel", "Exit without saving"),
+            ],
+        ).run()
+
+        if action in (None, "cancel"):
+            return
+        if action == "save":
+            config["LLM_MODEL"] = llm_model
+            config["VLM_MODEL"] = vlm_model
+            config["LLM_SERVER_MODELS"] = ",".join(server_models)
+            save_config(config)
+            print(f"Saved configuration to {CONFIG_FILE}")
+            return
+        if action == "server":
+            selection = checkboxlist_dialog(
+                title="LLM Server Models",
+                text="Select models, then press Enter",
+                values=[(model, model) for model in MODELS],
+                default_values=[model for model in MODELS if model in server_models],
+            ).run()
+            if selection is not None:
+                server_models = selection
+        elif action == "llm":
+            selection = choose_one("LLM Model", llm_model)
+            if selection is not None:
+                llm_model = selection
+        elif action == "vlm":
+            selection = choose_one("VLM Model", vlm_model)
+            if selection is not None:
+                vlm_model = selection
+
+
+if __name__ == "__main__":
+    main()

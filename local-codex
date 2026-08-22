@@ -1,10 +1,10 @@
 #!/bin/sh -e
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-if [ -f "$SCRIPT_DIR/.env" ]; then
-    . "$SCRIPT_DIR/.env"
+CONFIG_FILE="$HOME/.local-model-config.env"
+if [ -f "$CONFIG_FILE" ]; then
+    . "$CONFIG_FILE"
 fi
 
 SERVER=${MODEL_SERVER:-"http://localhost:8080"}
-MODEL=${LLM_MODEL:-"$(curl -s $SERVER/models | jq -r '.data[0].id')"}
+MODEL=${LLM_MODEL:-"unsloth/gemma-3-4b-it-GGUF:Q4_K_M"}
 codex -c model_provider="llamacpp" -c model="$MODEL" -c model_providers.llamacpp.name="llama.cpp" -c model_providers.llamacpp.base_url="$SERVER/v1" -c model_providers.llamacpp.wire_api="responses" -c model_providers.llamacpp.api_key="x" "$@"

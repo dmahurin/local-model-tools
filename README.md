@@ -5,6 +5,16 @@ local language model servers and clients from the command line.
 
 ## Tools
 
+### `local-model-config`
+Interactively configures the models used by the local tools. Its menu shows the
+current LLM server, LLM, and VLM selections and opens a selection screen for
+each category. Settings are saved as `NAME=VALUE` entries in
+`~/.local-model-config.env`.
+
+```bash
+local-model-config
+```
+
 ### `local-codex`
 Executes the `@openai/codex` CLI against the local LLM server.
 
@@ -25,6 +35,15 @@ Usage:
 ```bash
 start-llm-server
 ```
+
+To update only the server model selection in `~/.local-model-config.env`:
+```bash
+start-llm-server -config
+```
+
+The server selection is stored as a comma-separated `LLM_SERVER_MODELS` value
+containing full model identifiers. All tools default to
+`unsloth/gemma-3-4b-it-GGUF:Q4_K_M` when no configuration has been saved.
 
 ### `local-llm`
 Convenience wrapper around `llama-cli`. Uses gpt-oss-20b by default.

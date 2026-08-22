@@ -17,6 +17,7 @@ script-files = [
     "image2image",
     "local-codex",
     "local-llm",
+    "local-model-config",
     "local-vlm",
     "start-llm-server",
 ]

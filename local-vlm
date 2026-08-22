@@ -1,10 +1,9 @@
 #!/bin/sh -e
 
-script_dir="$(dirname "$0")"
-
-if [ -e "$script_dir/.env" ]; then
+config_file="$HOME/.local-model-config.env"
+if [ -e "$config_file" ]; then
  set -o allexport
- . "$script_dir/.env"
+ . "$config_file"
  set +o allexport
 fi
 MODEL="${VLM_MODEL:-"unsloth/gemma-3-4b-it-GGUF:Q4_K_M"}"
