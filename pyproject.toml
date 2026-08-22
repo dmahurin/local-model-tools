@@ -15,8 +15,8 @@ dependencies = [
 [tool.setuptools]
 script-files = [
     "image2image",
-    "run-codex-cli",
-    "run-llm-cli",
-    "run-vlm-cli",
+    "local-codex",
+    "local-llm",
+    "local-vlm",
     "start-llm-server",
 ]

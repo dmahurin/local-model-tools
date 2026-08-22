@@ -5,17 +5,17 @@ local language model servers and clients from the command line.
 
 ## Tools
 
-### `run-codex-cli`
+### `local-codex`
 Executes the `@openai/codex` CLI against the local LLM server.
 
 Run interactively:
 ```bash
-run-codex-cli
+local-codex
 ```
 
 Run non-interactively:
 ```bash
-run-codex-cli 'Generate and commit a README.md for this project'
+local-codex 'Generate and commit a README.md for this project'
 ```
 
 ### `start-llm-server`
@@ -26,25 +26,25 @@ Usage:
 start-llm-server
 ```
 
-### `run-llm-cli`
+### `local-llm`
 Convenience wrapper around `llama-cli`. Uses gpt-oss-20b by default.
 
 Run interactively:
 ```bash
-run-llm-cli
+local-llm
 ```
 
 Run non-interactively:
 ```bash
-run-llm-cli "How far away is the Moon?"
+local-llm "How far away is the Moon?"
 ```
 
-### `run-vlm-cli`
+### `local-vlm`
 Run VLM model using `llama-mtmd`. Uses gemma-3-4b-it by default.
 
 Run non-interactively:
 ```bash
-run-vlm-cli image.jpg "Describe this image."
+local-vlm image.jpg "Describe this image."
 ```
 
 ### `image2image`
