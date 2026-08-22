@@ -24,6 +24,8 @@ MODELS = [
     "unsloth/Qwen3.5-9B-GGUF:Q4_K_M",
     "unsloth/Qwen3.5-27B-GGUF:Q4_K_M",
     "unsloth/gemma-3-4b-it-GGUF:Q4_K_M",
+    "meta-models/Muse-Glimmer-30B-GGUF:muse-glimmer-30B-kquant-dynamic.gguf",
+    "bloomer010/Ling-3.0-tiny-GGUF:Q4_K_M",
 ]
 
 
